@@ -1,2 +1,4 @@
-java -jar deepseek.jar
-即可运行
+配置jdk环境变量  
+在命令行运行  
+java -jar deepseek.jar  
+

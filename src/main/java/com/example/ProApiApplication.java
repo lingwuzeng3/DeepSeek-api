@@ -8,6 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 
 @SpringBootApplication
@@ -20,29 +23,37 @@ public class ProApiApplication {
     @Autowired
     private static DeepSeekService deepSeekService;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
         context = SpringApplication.run(ProApiApplication.class, args);
         deepSeekService = context.getBean(DeepSeekService.class);
         DeepSeek();
     }
 
-    public static void DeepSeek(){
+    public static void DeepSeek() throws Exception {
         Scanner input = new Scanner(System.in,"GBK");
         boolean flag = true;
-        while(flag){
-            System.out.println("请输入问题(exit退出回答):");
-            String msg = input.nextLine();
-            if (!msg.equals("exit")){
-                System.out.println("========================================");
-                System.out.println("思考中...");
-                String content = deepSeekService.chat(msg);
-                System.out.println("DeepSeek answer :>\n" + content);
-                System.out.println("========================================");
-            }else{
-                flag = false;
+        try(
+                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("src/main/resources/output.md"));
+        ){
+            while(flag){
+                System.out.println("请输入问题(exit退出回答):");
+                String msg = input.nextLine();
+                if (!msg.equals("exit")){
+                    System.out.println("========================================");
+                    System.out.println("思考中...");
+                    String content = deepSeekService.chat(msg);
+                    //输出到控制台
+                    System.out.println("DeepSeek answer :>\n" + content);
+                    //输出到output文件中
+                    bufferedWriter.write(content);
+                    bufferedWriter.flush();
+                    System.out.println("========================================");
+                }else{
+                    flag = false;
+                }
             }
+            System.out.println("对话结束...");
         }
-        System.out.println("对话结束...");
     }
 }
 
